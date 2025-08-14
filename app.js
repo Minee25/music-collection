@@ -10,7 +10,7 @@ const methodOverride = require('method-override');
 const app = express();
 require("./src/database/dbConfig");
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8080;
 
 // View engine
 app.set("view engine", "ejs");
@@ -56,6 +56,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
 });
