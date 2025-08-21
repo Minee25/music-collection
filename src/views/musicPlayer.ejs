@@ -1,0 +1,84 @@
+<!-- Header -->
+<header class="text-center py-8">
+  <h1 class="text-4xl md:text-6xl font-bold text-blue-800 mb-4">
+    🎵 Music 🎵
+  </h1>
+  <p class="text-xl text-blue-500 font-medium">เพลงที่เต็มไปด้วยอารมณ์และความรู้สึก</p>
+</header>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-12">
+  <div class="max-w-5xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <% if (music && music.youtube_id) { %>
+        <div class="relative pb-[56.25%] h-0">
+          <iframe
+            class="absolute top-0 left-0 w-full h-full"
+            src="https://www.youtube.com/embed/<%= music.youtube_id %>"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+        </div>
+      <% } else { %>
+        <div class="relative pb-[56.25%] h-0 bg-gray-200 flex items-center justify-center">
+          <p class="text-gray-500 text-lg">ไม่พบวิดีโอ YouTube</p>
+        </div>
+      <% } %>
+    
+      <div class="p-6">
+        <% if (music) { %>
+          <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+            <%= music.title || 'ไม่มีชื่อเพลง' %>
+          </h2>
+          <p class="text-gray-600">
+            <%= music.description || '' %>
+          </p>
+        <% } else { %>
+          <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+            ไม่พบข้อมูลเพลง
+          </h2>
+          <p class="text-gray-600">
+            ไม่สามารถโหลดข้อมูลเพลงได้
+          </p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto text-center space-y-4">
+    <% if (music && music.youtube_id) { %>
+      <a href="https://youtu.be/<%= music.youtube_id %>" 
+        target="_blank"
+        class="inline-flex items-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+        <i class="fa-brands fa-youtube text-2xl mr-3"></i>
+        ดูบน YouTube
+      </a>
+    <% } else { %>
+      <p class="text-gray-500 text-lg">ไม่พบลิงก์ YouTube</p>
+    <% } %>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto text-center">
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+      <h2 class="text-3xl font-bold text-blue-800 mb-4">
+        ศิลปิน
+      </h2>
+      <p class="text-lg text-blue-500 mb-6 font-semibold">
+        <%= music ? (music.artist || 'ไม่ระบุศิลปิน') : 'ไม่ระบุศิลปิน' %>
+      </p>
+      <div class="flex items-center justify-center space-x-4 text-blue-500">
+        <span class="text-2xl">🎶</span>
+        <span class="text-2xl">💙</span>
+        <span class="text-2xl">🎵</span>
+      </div>
+    </div>
+  </div>
+</div>

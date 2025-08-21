@@ -1,0 +1,130 @@
+<!-- Hero Section -->
+<header class="container mx-auto relative text-center py-16 px-4 mt-4">
+  <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl mx-4"></div>
+  <div class="relative z-10">
+    <h1 class="text-5xl md:text-7xl font-bold text-blue-800 mb-6">
+      🎵 Music Collection 🎵
+    </h1>
+    <p class="text-xl md:text-2xl text-blue-600 font-medium mb-8">
+      เพลงที่เต็มไปด้วยอารมณ์และความรู้สึก
+    </p>
+    <div class="flex items-center justify-center space-x-6 text-4xl">
+      <span class="animate-bounce">🎶</span>
+      <span class="animate-bounce delay-100">💙</span>
+      <span class="animate-bounce delay-200">🎵</span>
+      <span class="animate-bounce delay-300">🎤</span>
+      <span class="animate-bounce delay-150">🎸</span>
+    </div>
+  </div>
+</header>
+
+<!-- Stats Section -->
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div class="space-y-2">
+          <div class="text-3xl font-bold text-blue-800">
+            <%= musicList.length %>
+          </div>
+          <div class="text-blue-600 font-medium">เพลงทั้งหมด</div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-3xl font-bold text-purple-800">
+            <%= new Set(musicList.map(music=> music.artist)).size %>
+          </div>
+          <div class="text-purple-600 font-medium">ศิลปิน</div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-3xl font-bold text-green-800">🎵</div>
+          <div class="text-green-600 font-medium">ความสุข</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Music Collection -->
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-bold text-blue-800 text-center mb-12">
+      🎶 คอลเลกชันเพลง 🎶
+    </h2>
+
+    <% if (musicList && musicList.length> 0) { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <% musicList.forEach(music=> { %>
+          <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transform transition-all duration-300 overflow-hidden group">
+            <div class="relative">
+              <% if (music.youtube_id) { %>
+                <div class="relative pb-[56.25%] h-0 bg-gray-200">
+                  <a href="/music/<%= music._id %>">
+                    <img src="https://img.youtube.com/vi/<%= music.youtube_id %>/hqdefault.jpg" alt="<%= music.title %>"class="absolute top-0 left-0 w-full h-full object-cover" loading="lazy" />
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <i class="fas fa-play text-white text-4xl"></i>
+                    </div>
+                  </a>
+                </div>
+              <% } else { %>
+                <div
+                  class="relative pb-[56.25%] h-0 bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center">
+                  <span class="text-6xl">🎵</span>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="p-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-2">
+                <%= music.title || 'ไม่มีชื่อเพลง' %>
+              </h3>
+              <p class="text-blue-500 font-medium mb-3">
+                <i class="fas fa-user text-sm mr-2"></i>
+                <%= music.artist || 'ไม่ระบุศิลปิน' %>
+              </p>
+              <% if (music.description) { %>
+                <p class="text-gray-600 text-sm mb-4">
+                  <%= music.description %>
+                </p>
+              <% } %>
+
+              <div class="flex space-x-2">
+                <a href="/music/<%= music.music_id %>" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors duration-200">
+                  <i class="fas fa-play mr-2"></i> เล่น
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-16">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl max-w-2xl mx-auto">
+          <div class="text-6xl mb-6">🎵</div>
+          <h3 class="text-2xl font-bold text-blue-800 mb-4">
+            ยังไม่มีเพลงในคอลเลกชัน
+          </h3>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-16">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-3xl p-12">
+      <h3 class="text-3xl font-bold text-blue-800 mb-4">
+        🎶 แบ่งปันเพลงที่คุณชอบ 🎶
+      </h3>
+      <p class="text-lg text-blue-600 mb-8">
+        คอลเลกชันเพลงที่เต็มไปด้วยความทรงจำและอารมณ์
+      </p>
+      <div class="flex items-center justify-center space-x-8 text-blue-400">
+        <span class="text-3xl animate-pulse">♪</span>
+        <span class="text-4xl animate-bounce delay-75">♫</span>
+        <span class="text-3xl animate-pulse delay-150">♪</span>
+        <span class="text-4xl animate-bounce delay-300">♫</span>
+        <span class="text-3xl animate-pulse delay-75">♪</span>
+      </div>
+    </div>
+  </div>
+</div>
