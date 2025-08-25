@@ -43,6 +43,7 @@ app.use(morgan('dev'));
 app.use("/", require("./src/routes/music.route"));
 app.use("/", require("./src/routes/auth.route"));
 app.use("/", require("./src/routes/admin.route"));
+app.use(require("./src/routes/comment.route"));
 
 // 404 Error Handler - Must be placed after all routes
 app.use((req, res, next) => {

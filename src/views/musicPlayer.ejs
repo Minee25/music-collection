@@ -82,3 +82,116 @@
     </div>
   </div>
 </div>
+
+<div class="container mx-auto px-4 py-12">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-blue-800">
+          💬 แสดงความคิดเห็น
+        </h2>
+        <button 
+          id="add-comment-btn"
+          type="button"
+          class="mt-6 sm:mt-0 bg-gradient-to-r cursor-pointer from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-bold py-2 px-5 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-blue-50">
+          เพิ่มความคิดเห็น
+        </button>
+      </div>
+
+      <!-- แสดงรายการคอมเมนต์ -->
+      <div class="mt-10 space-y-6 text-left">
+        <% if (comments && comments.length > 0) { %>
+          <% comments.forEach(comment => { %>
+            <div class="bg-white/90 rounded-xl shadow-md p-5">
+              <div class="flex items-center mb-2">
+                <span class="text-sm font-semibold text-gray-500">
+                  <%= new Date(comment.createdAt).toLocaleString("th-TH") %>
+                </span>
+              </div>
+              <p class="text-gray-700">
+                <%= comment.content %>
+              </p>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p class="text-gray-500 text-center">ยังไม่มีความคิดเห็นในเพลงนี้</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("add-comment-btn").addEventListener("click", () => {
+    Swal.fire({ 
+      title: "💬 เพิ่มความคิดเห็น",
+      html: `
+        <form id="comment-form" class="space-y-4 text-left">
+          <textarea 
+            id="comment-textarea" 
+            name="content" 
+            rows="4" 
+            placeholder="พิมพ์ความคิดเห็นของคุณ..." 
+            class="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-700"
+            required
+          ></textarea>
+          <button 
+            type="submit"
+            class="w-full bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white font-bold py-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+            ส่งความคิดเห็น
+          </button>
+        </form>
+      `,
+      showCloseButton: true,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      width: "40rem",
+      background: "rgba(255,255,255,0.95)",
+      backdrop: `
+        rgba(0,0,0,0.4)
+        left top
+        no-repeat
+      `,
+      customClass: {
+        popup: "rounded-2xl shadow-2xl",
+        title: "text-2xl font-bold text-blue-800 mb-4",
+      },
+      didOpen: () => {
+        const form = Swal.getHtmlContainer().querySelector("#comment-form");
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          
+          const content = form.content.value.trim();
+
+          if (!content) {
+            Swal.showValidationMessage("กรุณากรอกความคิดเห็น");
+            return;
+          }
+
+          fetch(`/music/<%= music._id %>/comments`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content })
+          })
+          .then(res => res.json())
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "เพิ่มความคิดเห็นเรียบร้อย 💜",
+              confirmButtonColor: "#2563eb"
+            }).then(() => {
+              location.reload();
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "เกิดข้อผิดพลาด",
+              text: "ไม่สามารถเพิ่มความคิดเห็นได้"
+            });
+          });
+        });
+      }
+    });
+  });
+</script>

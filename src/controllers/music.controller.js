@@ -1,4 +1,5 @@
 const musicDB = require("../models/music.model");
+const commentDB = require("../models/comment.model");
 const mongoose = require("mongoose");
 
 exports.home = async (req, res) => {
@@ -76,11 +77,14 @@ exports.musicPlayer = async (req, res) => {
 
     // ตัด query string ส่วนเกินออก
     youtubeId = youtubeId.split("?")[0].split("&")[0];
-    
+
+    const comments = await commentDB.find({ musicId: music._id }).sort({ createdAt: -1 }).lean();
+
     // เพิ่ม youtube_id เข้าไปใน music object
     music.youtube_id = youtubeId;
     locals.music = music;
     locals.title = music.title || "Music";
+    locals.comments = comments;
     res.render("musicPlayer", locals);
   } catch (err) {
     console.error(err.message);
