@@ -105,7 +105,10 @@
             <div class="bg-white/90 rounded-xl shadow-md p-5">
               <div class="flex items-center mb-2">
                 <span class="text-sm font-semibold text-gray-500">
-                  <%= new Date(comment.createdAt).toLocaleString("th-TH") %>
+                  <%= new Date(comment.createdAt).toLocaleString("th-TH", { 
+                    dateStyle: "short", 
+                    timeStyle: "short" 
+                  }) %>
                 </span>
               </div>
               <p class="text-gray-700">
