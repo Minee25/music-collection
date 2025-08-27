@@ -6,13 +6,11 @@ exports.musicList = async (req, res) => {
   }
 
   try {
-    // Fetch all music from database
     const musicList = await musicDB.find({}).sort({ createdAt: -1 });
 
-    res.render("./admin/musicList", {
-      ...locals,
-      musicList: musicList || []
-    });
+    locals.musicList = musicList || [];
+
+    res.render("./admin/musicList", locals);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Internal Server Error");
@@ -64,7 +62,6 @@ exports.deleteMusic = async (req, res) => {
       return res.redirect("/admin/music-list");
     }
 
-    // Delete music from database
     await musicDB.findByIdAndDelete(id);
 
     req.flash("success", "ลบเพลงสำเร็จ");
@@ -97,10 +94,9 @@ exports.editMusic = async (req, res) => {
       return res.redirect("/admin/music-list");
     }
 
-    res.render("./admin/editMusic", {
-      ...locals,
-      music: music
-    });
+    locals.music = music;
+
+    res.render("./admin/editMusic", locals);
   } catch (err) {
     console.error(err.message);
     req.flash("error", "เกิดข้อผิดพลาดในการโหลดข้อมูลเพลง");

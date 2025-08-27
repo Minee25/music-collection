@@ -10,11 +10,11 @@
 <div class="container mx-auto px-4 py-12">
   <div class="max-w-5xl mx-auto">
     <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-      <% if (music && music.youtube_id) { %>
+      <% if (music && youtube_id) { %>
         <div class="relative pb-[56.25%] h-0">
           <iframe
             class="absolute top-0 left-0 w-full h-full"
-            src="https://www.youtube.com/embed/<%= music.youtube_id %>"
+            src="https://www.youtube.com/embed/<%= youtube_id %>"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -29,22 +29,36 @@
         </div>
       <% } %>
     
-      <div class="p-6">
-        <% if (music) { %>
-          <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
-            <%= music.title || 'ไม่มีชื่อเพลง' %>
-          </h2>
-          <p class="text-gray-600">
-            <%= music.description || '' %>
+      <div class="p-6 flex justify-between items-center">
+        <div>
+          <% if (music) { %>
+            <h2 class="text-lg sm:text-2xl font-semibold text-gray-800">
+              <%= music.title || 'ไม่มีชื่อเพลง' %>
+            </h2>
+            
+            <% if (music.description) { %>
+              <p class="text-gray-600 mt-2">
+                <%= music.description %>
+              </p>
+            <% } %>
+          <% } else { %>
+            <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
+              ไม่พบข้อมูลเพลง
+            </h2>
+            <p class="text-gray-600">
+              ไม่สามารถโหลดข้อมูลเพลงได้
+            </p>
+          <% } %>
+        </div>
+
+        <div class="relative flex items-center group transition-transform duration-200">
+          <button type="button" id="like-btn" class="cursor-pointer focus:outline-none">
+            <i class="fa-regular fa-heart text-4xl text-gray-500 transition-colors duration-200"></i>
+          </button>
+          <p id="like-count" class="text-gray-500 font-semibold text-xl w-full h-full ml-2">
+            <%= likeCount ? likeCount.likeCount : 0 %>
           </p>
-        <% } else { %>
-          <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
-            ไม่พบข้อมูลเพลง
-          </h2>
-          <p class="text-gray-600">
-            ไม่สามารถโหลดข้อมูลเพลงได้
-          </p>
-        <% } %>
+        </div>
       </div>
     </div>
   </div>
@@ -52,8 +66,8 @@
 
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-2xl mx-auto text-center space-y-4">
-    <% if (music && music.youtube_id) { %>
-      <a href="https://youtu.be/<%= music.youtube_id %>" 
+    <% if (music && youtube_id) { %>
+      <a href="https://youtu.be/<%= youtube_id %>" 
         target="_blank"
         class="inline-flex items-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
         <i class="fa-brands fa-youtube text-2xl mr-3"></i>
@@ -105,9 +119,13 @@
             <div class="bg-white/90 rounded-xl shadow-md p-5">
               <div class="flex items-center mb-2">
                 <span class="text-sm font-semibold text-gray-500">
-                  <%= new Date(comment.createdAt).toLocaleString("th-TH", { 
-                    dateStyle: "short", 
-                    timeStyle: "short" 
+                  <%= new Date(comment.createdAt).toLocaleString("th-TH", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false
                   }) %>
                 </span>
               </div>
@@ -125,6 +143,82 @@
 </div>
 
 <script>
+  // Like **********
+  // Load from Local Storage
+  if (localStorage.getItem("<%= music._id %>") === "true") {
+    document.querySelector("#like-btn i").classList.remove("fa-regular");
+    document.querySelector("#like-btn i").classList.add("fa-solid");
+    
+    document.querySelector("#like-btn i").classList.remove("text-gray-500");
+    document.querySelector("#like-btn i").classList.add("text-pink-500");
+  } else {
+    document.querySelector("#like-btn i").classList.remove("text-pink-500");
+    document.querySelector("#like-btn i").classList.add("text-gray-500");
+  }
+
+  document.getElementById("like-btn").addEventListener("click", async () => {
+    const liked = localStorage.getItem("<%= music._id %>");
+    const iconLikeEl = document.querySelector("#like-btn i");
+    const likeCountEl = document.getElementById("like-count");
+
+    if (liked === "true") {
+      // Unlike
+      iconLikeEl.classList.remove("text-pink-500");
+      iconLikeEl.classList.add("text-gray-500");
+      iconLikeEl.classList.remove("fa-solid");
+      iconLikeEl.classList.add("fa-regular");
+      localStorage.removeItem("<%= music._id %>");
+
+      try {
+        const res = await fetch(`/music/<%= music._id %>/unlike`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+        
+        // อัปเดตจำนวน like
+        const currentCount = parseInt(likeCountEl.textContent) || 0;
+        likeCountEl.textContent = Math.max(0, currentCount - 1);
+      } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+    } else {
+      // Add like
+      iconLikeEl.classList.remove("text-gray-500");
+      iconLikeEl.classList.add("text-pink-500");
+      iconLikeEl.classList.remove("fa-regular");
+      iconLikeEl.classList.add("fa-solid");
+      localStorage.setItem("<%= music._id %>", "true");
+
+      try {
+        const res = await fetch(`/music/<%= music._id %>/add-like`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || `HTTP ${res.status}`);
+        }
+
+        // อัปเดตจำนวน like
+        const currentCount = parseInt(likeCountEl.textContent) || 0;
+        likeCountEl.textContent = currentCount + 1;
+      } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  });
+
+  // Comment **********
   document.getElementById("add-comment-btn").addEventListener("click", () => {
     Swal.fire({ 
       title: "💬 เพิ่มความคิดเห็น",
@@ -161,7 +255,7 @@
       },
       didOpen: () => {
         const form = Swal.getHtmlContainer().querySelector("#comment-form");
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           
           const content = form.content.value.trim();
@@ -171,28 +265,32 @@
             return;
           }
 
-          fetch(`/music/<%= music._id %>/comments`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content })
-          })
-          .then(res => res.json())
-          .then(() => {
-            Swal.fire({
+          try {
+            const res = await fetch(`/music/<%= music._id %>/comments`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.message || `HTTP ${res.status}`);
+            }
+
+            await Swal.fire({
               icon: "success",
               title: "เพิ่มความคิดเห็นเรียบร้อย 💜",
-              confirmButtonColor: "#2563eb"
-            }).then(() => {
-              location.reload();
+              confirmButtonColor: "#2563eb" 
             });
-          })
-          .catch(() => {
+
+            location.reload();
+          } catch (err) {
             Swal.fire({
               icon: "error",
               title: "เกิดข้อผิดพลาด",
               text: "ไม่สามารถเพิ่มความคิดเห็นได้"
             });
-          });
+          }
         });
       }
     });
